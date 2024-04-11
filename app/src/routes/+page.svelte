@@ -10,7 +10,7 @@
   };
 
   let messages: Message[] = [];
-  let businessDescription: string = '';
+  let businessDesc: string = '';
 
   interface GptRes {
     gptMsg: string;
@@ -48,9 +48,10 @@
         return;
       }
 
-      businessDescription = data.gptMsg;
+      businessDesc = data.gptMsg;
+      businessDesc = businessDesc.trim();
 
-      messages = [...messages, { text: businessDescription, isBot: true }];
+      messages = [...messages, { text: businessDesc, isBot: true }];
       messages = [...messages, { text: 'How is this description? Press "Confirm" if this is good, otherwise let me know what you\'d like to change!', isBot: true }];
     } catch (error) {
       console.error('Error handling description:', error);
@@ -60,10 +61,28 @@
     (event.target as HTMLInputElement).value = '';
   }
 
-  function handlePersona() {
+  async function handlePersona() {
+    // Make sure the user has provided a business description
+    if (!businessDesc || businessDesc.length <= 5) {
+      messages = [...messages, { text: 'Please provide a business description first.', isBot: true }];
+      return;
+    }
+
     // Add bot message(s)
     messages = [...messages, { text: 'I will now generate a customer persona for you.', isBot: true }];
-    // TODO: add request to GPT, and add to messages
+
+    try {
+      const { data, error } = await postApi<ApiRes<GptRes>>('persona', { businessDesc });
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      const personaAnalysis: string = data.gptMsg;
+      messages = [...messages, { text: personaAnalysis, isBot: true }];
+    } catch (error) {
+      console.error('Error generating persona:', error);
+    }
   }
 
 </script>
