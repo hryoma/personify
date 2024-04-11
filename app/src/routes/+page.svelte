@@ -1,5 +1,8 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { postApi } from '$lib/api';
+  import type { ApiRes } from '$lib/api';
+
 
   interface Message {
     text: string;
@@ -7,6 +10,11 @@
   };
 
   let messages: Message[] = [];
+  let businessDescription: string = '';
+
+  interface GptRes {
+    gptMsg: string;
+  }
 
   onMount(() => {
     reset();
@@ -16,17 +24,37 @@
     messages = [{ text: 'Hello! I am your customer persona assistant. What is your business about?', isBot: true }];
   }
 
-  function handleDescription(event: KeyboardEvent | MouseEvent) {
+  async function handleDescription(event: KeyboardEvent | MouseEvent) {
     if (event instanceof KeyboardEvent && event.key !== 'Enter') {
+      return;
+    }
+    let userInput = event.target.value as string;
+    userInput = userInput.trim();
+
+    // Input validation: check if the user input is empty
+    if (!userInput || userInput.length <= 5) {
+      messages = [...messages, { text: 'Please provide more information about your business.', isBot: true }];
       return;
     }
 
     // Add user message to the chat
-    messages = [...messages, { text: event.target.value, isBot: false }];
+    messages = [...messages, { text: userInput, isBot: false }];
 
     // Add bot message(s)
-    // TODO: add request to GPT, and add to messages
-    messages = [...messages, { text: 'How is this description? Press "Confirm" if this is good, otherwise let me know what you\'d like to change!', isBot: true }];
+    try {
+      const { data, error } = await postApi<ApiRes<GptRes>>('description', { userInput });
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      businessDescription = data.gptMsg;
+
+      messages = [...messages, { text: businessDescription, isBot: true }];
+      messages = [...messages, { text: 'How is this description? Press "Confirm" if this is good, otherwise let me know what you\'d like to change!', isBot: true }];
+    } catch (error) {
+      console.error('Error handling description:', error);
+    }
 
     // Clear the input field
     (event.target as HTMLInputElement).value = '';
@@ -75,6 +103,7 @@
     padding: 10px;
     border-radius: 5px;
     max-width: 80%;
+    white-space: pre-wrap;
   }
 
   .bot-msg {

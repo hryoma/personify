@@ -23,8 +23,7 @@ export async function POST({ request }) {
 			],
 			model: 'gpt-3.5-turbo'
 		});
-		console.log(completion.choices[0]);
-		return json({ gptMsg: completion.choices[0] });
+		return json({ gptMsg: completion.choices[0].message.content });
 	} catch (error) {
 		// console.error('Error:', error);
 		return json({ error: error }, { status: 500 });
