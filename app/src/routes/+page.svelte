@@ -49,6 +49,7 @@
       }
 
       businessDesc = data.gptMsg;
+      console.log(data, businessDesc)
       businessDesc = businessDesc.trim();
 
       messages = [...messages, { text: businessDesc, isBot: true }];
