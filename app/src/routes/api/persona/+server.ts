@@ -12,8 +12,16 @@ export async function POST({ request }) {
     Please aim for concise insights. Specific, yet brief explanations are valued to understand your perspective better while optimizing token use. The following is the business and target demographic description:`;
 
 	try {
-		const { businessDesc } = await request.json();
-		const gptMsg = await askGpt(prompt, businessDesc);
+		const { businessDesc, targetDemographics } = await request.json();
+
+		let userInput = `${businessDesc}\n\n`;
+		userInput += targetDemographics
+			.map((demographic) => {
+				return `Target Demographic: ${demographic}\n`;
+			})
+			.join('\n');
+
+		const gptMsg = await askGpt(prompt, userInput);
 		return json({ gptMsg });
 	} catch (error) {
 		console.error('Error:', error);

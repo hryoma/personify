@@ -5,6 +5,37 @@
 		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		%sveltekit.head%
+		<style lang="scss">
+			:root {
+				--primary: #680bff;
+				--text-dark: #333;
+				--text-light: #9f9f9f;
+				--bg-light: #fafafa;
+				--bg-dark: #d9d9d9;
+			}
+
+			body {
+				padding: 0;
+				margin: 0;
+				background-color: var(--bg-light);
+				font-family: 'DM Sans', sans-serif;
+			}
+
+			h1,
+			h2,
+			h3,
+			h4,
+			h5,
+			h6,
+			p,
+			pre,
+			a,
+			span,
+			button {
+				font-family: 'DM Sans', sans-serif;
+				color: var(--text-dark);
+			}
+		</style>
 	</head>
 	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">%sveltekit.body%</div>

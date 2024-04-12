@@ -17,7 +17,6 @@ interface ApiRes<T> {
  */
 async function fetchAPI<T>(url: string, options: FetchOptions): Promise<ApiRes<T>> {
 	try {
-		console.log('fetchAPI', url, options);
 		const response = await fetch(url, options);
 		if (!response.ok) {
 			const errorData: any = await response.json();
